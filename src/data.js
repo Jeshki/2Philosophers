@@ -2,7 +2,7 @@ import sokratesImg from './pages/img/sokrates.png';
 import platonImg from './pages/img/platon.png';
 import aristotelImg from './pages/img/aristotel.png';
 import senekaImg from './pages/img/seneka.png';
-import schellingImg from './pages/img/schelling.png';
+import schellingImg from './pages/img/Schelling.png';
 import leibnizImg from './pages/img/leibniz.png';
 import konfucijusImg from './pages/img/konfucijus.png';
 import husserlImg from './pages/img/husserl.png';
