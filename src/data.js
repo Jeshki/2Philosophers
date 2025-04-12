@@ -55,7 +55,7 @@ import pascalImg from './pages/img/pascalis.png';
 import diogenesImg from './pages/img/diogenas.png';
 import zenoImg from './pages/img/zenius.png';
 import augustineImg from './pages/img/augustinas.png';
-import confuciusImg from './pages/img/Konfucijus.png';
+import confuciusImg from './pages/img/konfucijus.png';
 import danteImg from './pages/img/dante.png';
 import lutherImg from './pages/img/luther.png';
 import debeauvoirImg from './pages/img/beuvoir.png';
