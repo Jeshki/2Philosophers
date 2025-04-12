@@ -1,17 +1,20 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom"; // Use NavLink for active state
 import { BsSunFill, BsMoonStarsFill } from "react-icons/bs";
 
 export default function DesktopNav({ darkMode, setDarkMode }) {
+  const activeClassName = "text-indigo-600 dark:text-indigo-400"; // Style for active link
+  const inactiveClassName = "hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors";
+
   return (
     <ul
-      className="hidden md:flex gap-6 items-center text-lg font-medium uppercase tracking-wide"
+      className="hidden md:flex gap-6 items-center text-lg font-medium uppercase tracking-wide text-gray-700 dark:text-gray-300" // Adjusted text colors
       style={{ fontFamily: "'Cinzel', serif" }}
     >
-      <li><Link to="/" className="hover:text-indigo-600 transition-colors">Philosophers</Link></li>
-      <li><Link to="/biographies" className="hover:text-indigo-600 transition-colors">Biographies</Link></li>
-      <li><Link to="/about" className="hover:text-indigo-600 transition-colors">About Me</Link></li>
-      <li><Link to="/contact" className="hover:text-indigo-600 transition-colors">Contact</Link></li>
+      <li><NavLink to="/" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>Philosophers</NavLink></li>
+      <li><NavLink to="/biographies" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>Biographies</NavLink></li>
+      <li><NavLink to="/about" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>About Me</NavLink></li>
+      <li><NavLink to="/contact" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>Contact</NavLink></li>
       <li>
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -24,9 +27,9 @@ export default function DesktopNav({ darkMode, setDarkMode }) {
             }`}
           >
             {darkMode ? (
-              <BsSunFill className="text-yellow-400" />
+              <BsSunFill className="text-white" /> // Sun icon is white in dark mode
             ) : (
-              <BsMoonStarsFill className="text-indigo-800" />
+              <BsMoonStarsFill className="text-gray-800" /> // Moon icon is dark gray in light mode
             )}
           </div>
         </button>
