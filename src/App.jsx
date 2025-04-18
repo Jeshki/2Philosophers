@@ -11,9 +11,9 @@ import Header from "./pages/Header-components/Header";
 import { philosophers } from "./data";
 import { IdeologicalGroups } from "./enums";
 
+// Helper funkcijos metų išgavimui (lieka nepakitusios)
 const getStartYear = (yearsString) => {
   if (!yearsString || typeof yearsString !== 'string') return Infinity;
-
   const str = yearsString.toLowerCase().trim();
   if (str.includes('unknown')) return Infinity;
   if (str.includes('bc') || str.includes('bce')) {
@@ -32,7 +32,6 @@ const getStartYear = (yearsString) => {
 
 const getEndYear = (yearsString) => {
   if (!yearsString || typeof yearsString !== 'string') return -Infinity;
-
   const str = yearsString.toLowerCase().trim();
   if (str.includes('unknown')) return -Infinity;
   if (str.includes('bc') || str.includes('bce')) {
@@ -49,17 +48,23 @@ const getEndYear = (yearsString) => {
   return matches && matches.length > 1 ? parseInt(matches[1], 10) : matches ? parseInt(matches[0], 10) : -Infinity;
 };
 
+
 export default function App() {
+  // Dark mode state
   const [darkMode, setDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
     return savedMode === 'true';
   });
 
-  const [selectedPhilosopher, setSelectedPhilosopher] = useState(null);
+  // State filtrams ir rūšiavimui
   const [selectedGroup, setSelectedGroup] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
   const [sortBy, setSortBy] = useState('default');
 
+  // NAUJAS state modalui: saugo filosofą ir rodomo turinio tipą
+  const [modalContent, setModalContent] = useState({ philosopher: null, contentType: null });
+
+  // Dark mode efekto pritaikymas
   useEffect(() => {
     const html = document.documentElement;
     if (darkMode) {
@@ -71,6 +76,7 @@ export default function App() {
     }
   }, [darkMode]);
 
+  // Filosofų duomenų apdorojimas su metais (lieka nepakitęs)
   const processedPhilosophers = useMemo(() => {
     return philosophers.map(p => ({
       ...p,
@@ -79,9 +85,16 @@ export default function App() {
     }));
   }, []);
 
+  // NAUJA funkcija modalui atidaryti su konkrečiu turiniu
+  const handleOpenModal = (philosopher, contentType) => {
+    setModalContent({ philosopher, contentType });
+  };
+
+  // Filtruotų ir surūšiuotų filosofų sąrašas (logika nepakito)
   const filteredAndSortedPhilosophers = useMemo(() => {
     let result = [...processedPhilosophers];
 
+    // Filtravimas pagal grupę
     if (selectedGroup) {
       const groupIdeologies = IdeologicalGroups[selectedGroup];
       if (groupIdeologies && Array.isArray(groupIdeologies)) {
@@ -89,51 +102,63 @@ export default function App() {
       }
     }
 
+    // Filtravimas pagal regioną
     if (selectedRegion) {
       result = result.filter(p => p.geographicalOrder === selectedRegion);
     }
 
+    // Rūšiavimas
     if (sortBy === 'chronological') {
       result.sort((a, b) => a.startYear - b.startYear);
     } else if (sortBy === 'youngest_first') {
       result.sort((a, b) => b.startYear - a.startYear);
     } else if (sortBy === 'newest_by_death') {
       result.sort((a, b) => b.endYear - a.endYear);
-    } else {
+    } else { // 'default'
       result.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     return result;
   }, [processedPhilosophers, selectedGroup, selectedRegion, sortBy]);
 
+
   return (
     <Router>
-      <div className="min-h-screen bg-white dark:bg-black text-gray-800 dark:text-gray-200">
+      <div className="min-h-screen bg-white dark:bg-black text-gray-800 dark:text-gray-200 transition-colors duration-300">
         <Header darkMode={darkMode} setDarkMode={setDarkMode} />
-        <Routes>
-          <Route
-            path="/"
-            element={<HomePage
-              filteredPhilosophers={filteredAndSortedPhilosophers}
-              handleCardClick={setSelectedPhilosopher}
-              selectedGroup={selectedGroup}
-              setSelectedGroup={setSelectedGroup}
-              selectedRegion={selectedRegion}
-              setSelectedRegion={setSelectedRegion}
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-            />}
+        <main className="pt-4 pb-12"> {/* Pridėtas main elementas ir padding */}
+          <Routes>
+            <Route
+              path="/"
+              element={<HomePage
+                filteredPhilosophers={filteredAndSortedPhilosophers}
+                handleCardClick={handleOpenModal} // Perduodame naują funkciją
+                selectedGroup={selectedGroup}
+                setSelectedGroup={setSelectedGroup}
+                selectedRegion={selectedRegion}
+                setSelectedRegion={setSelectedRegion}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+              />}
+            />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/biographies" element={<Biographies />} />
+            {/* PhilosopherPage maršrutas lieka toks pat */}
+            <Route path="/philosopher/:id" element={<PhilosopherPage />} />
+          </Routes>
+        </main>
+        {/* Atnaujintas modalo atvaizdavimas */}
+        {modalContent.philosopher && modalContent.contentType && (
+          <BioModal
+            philosopher={modalContent.philosopher}
+            contentType={modalContent.contentType} // Perduodame turinio tipą
+            onClose={() => setModalContent({ philosopher: null, contentType: null })} // Funkcija uždarymui
           />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/biographies" element={<Biographies />} />
-          <Route path="/philosopher/:id" element={<PhilosopherPage />} />
-        </Routes>
-        {selectedPhilosopher && (
-          <BioModal philosopher={selectedPhilosopher} onClose={() => setSelectedPhilosopher(null)} />
         )}
         <Footer />
       </div>
     </Router>
   );
 }
+
